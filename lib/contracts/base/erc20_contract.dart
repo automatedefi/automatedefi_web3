@@ -11,7 +11,7 @@ class ERC20Contract extends ChangeNotifier {
 
   late ContractERC20 _contract;
 
-  final Map<String, BigInt> _allowances = {};
+  final Map<String, BigInt> allowances = {};
 
   String _name = "";
   String get name => _name;
@@ -23,25 +23,18 @@ class ERC20Contract extends ChangeNotifier {
     _contract = ContractERC20(address, wallet.signer!);
     _name = await _contract.name;
     _symbol = await _contract.symbol;
-    _contract.onApproval((owner, spender, value, event) {
-      if (owner.toLowerCase() != wallet.currentAddress.toLowerCase()) {
-        return;
-      }
-      _allowances[spender] = value;
-      notifyListeners();
-    });
     notifyListeners();
   }
 
-  BigInt allowance(String spender) {
-    _contract.allowance(wallet.currentAddress, spender).then((amount) {
-      _allowances[spender] = amount;
-      notifyListeners();
-    });
-    return _allowances[address] ?? BigInt.zero;
+  Future<BigInt> allowance(String spender) async {
+    final amount = await _contract.allowance(wallet.currentAddress, spender);
+    allowances[address] = amount;
+    notifyListeners();
+    return allowances[address] ?? BigInt.zero;
   }
 
-  void approve(String spender, BigInt amount) {
-    _contract.approve(spender, amount);
+  Future<void> approve(String spender, BigInt amount) async {
+    await _contract.approve(spender, amount);
+    await allowance(spender);
   }
 }

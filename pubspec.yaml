@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_riverpod: ^1.0.4
   flutter_web3: ^2.1.9
 
 dev_dependencies:
